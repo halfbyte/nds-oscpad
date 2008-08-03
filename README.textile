@@ -1,0 +1,5 @@
+What OSCpad will be:
+
+- An nds homebrew application that is basically a very flexible controller sending OSC (Open Sound Control) messages for almost every input available.
+- A reference implementation for sending OSC data over the DSWifi connection
+- (eventually) my first successfully completed NDS app (har har)
