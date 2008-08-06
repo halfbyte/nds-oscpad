@@ -1,5 +1,24 @@
 What OSCpad will be:
 
-- An nds homebrew application that is basically a very flexible controller sending OSC (Open Sound Control) messages for almost every input available.
-- A reference implementation for sending OSC data over the DSWifi connection
-- (eventually) my first successfully completed NDS app (har har)
+ * An nds homebrew application that is basically a very flexible controller sending OSC (Open Sound Control) messages for almost every input available.
+ * A reference implementation for sending OSC data over the DSWifi connection
+ * (eventually) my first successfully completed NDS app (har har)
+
+What OSCpad is right now:
+
+* A proof of concept of using dswifi to send UDP packages
+* A way to send non-OSC upd packets on the press of the A-Button
+
+What OSCpad will become quite soon:
+
+* a proof of concept on how to construct OSC messages
+
+What OSCpad will need for that:
+
+* A simple way to construct strings with 32Byte padding
+* A simple way to convert the endianness of 32Byte values (try ntohl, I'd say)
+
+What OSCpad learned me (is this even a sentence?)
+
+* OSCpack is not suited for embedded usage, at least not for someone with limited C/C++ knowledge, such as me.
+
