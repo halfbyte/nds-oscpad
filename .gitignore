@@ -1,5 +1,8 @@
 build/*
+arm7/build/*
+arm9/build/*
 *.nds
+*.ds.gba
 *.elf
 *.arm9
 *.arm7
