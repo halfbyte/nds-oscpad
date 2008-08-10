@@ -1,24 +1,65 @@
-What OSCpad will be:
+h1. nds-OSCpad
+
+
+
+h2. What OSCpad will be:
 
  * An nds homebrew application that is basically a very flexible controller sending OSC (Open Sound Control) messages for almost every input available.
  * A reference implementation for sending OSC data over the DSWifi connection
  * (eventually) my first successfully completed NDS app (har har)
+ 
+currently, OSCpad is plainly sending OSC messages over UPD to a hardcoded IP adress (10.0.2.1, as it is my Mac Wifi sharing IP).
 
-What OSCpad is right now:
+h2. Rationale
 
-* A proof of concept of using dswifi to send UDP packages
-* A way to send non-OSC upd packets on the press of the A-Button
+There's a de-facto standard for sending musical controller data from the Nintendo DS over Wifi to other devices, created by TobW and called DSMI. It works by sending MIDI data over a proprietary network protocol and decoding it on the host machine using the desktop application that comes with DSMI.
 
-What OSCpad will become quite soon:
+This is a great idea and it works pretty well. It is widely supported and there is a huge range of apps using it.
 
-* a proof of concept on how to construct OSC messages
+Now, there has been a standard for sending controller data over the 'net, called Open Sound Control, which emerged from a MIDI successor (*that* never happened, though) to some general, flexible protocol to send all kinds of controller and other data back and forth between applications and hardwares. There's a lot of software that supports receiving and sending OSC data, especially in the whole art/multimedia space: Programmes like PureData, Max/MSP, Supercollider, Processing etc. all support OSC.
 
-What OSCpad will need for that:
+So, with all the different sensors for the DS, like the touchpad, the ndsmotion and all the buttons, an OSC implementation for the NDS looked kinda obvious to me. It is not thought of as a better solution than all the DSMI software, but as a different solution for a different crowd.
 
-* A simple way to construct strings with 32Byte padding
-* A simple way to convert the endianness of 32Byte values (try ntohl, I'd say)
+h2. sent messages
 
-What OSCpad learned me (is this even a sentence?)
+* Touchpad samples: /nds/touch ,iii (x,y,pressure) // pressure's currently not working, I seem to use the wrong formula. Messages are sent as long as the pen is down.
+* Touchpad events: /nds/touch ,s (event) where event is UP or DOWN for KEYDOWN and KEYUP
+* NDSMotion samples /nds/motion ,iiii (x,y,z,gyro) // currently I'm sending the raw values, I'll switch over to the calibrated values soon.
 
-* OSCpack is not suited for embedded usage, at least not for someone with limited C/C++ knowledge, such as me.
+h2. planned messages (not yet implemented)
 
+* Button Event: /nds/button,ss (button, event) where button is one of UP DOWN LEFT RIGHT R L X Y A B START and event is one of UP DOWN. (I'll reserve the SELECT button to things like mode changes, IP configuration etc.) (TOP PRIORITY)
+* Microphone Volume sampling: /nds/mic, i (volume) where volume is simply the sampled volume on the NDS mic. (LOWER PRIORITY)
+
+h2. Visualisation
+
+* the touchpad should respond to touching. The top screen could display all the button presses.
+* Some kind of backchannel could be nice, like displaying a LED bar like thing or something.
+
+h2. Configuration
+
+* will be done via config file, I guess, probably with a UI for it later on.
+
+h2. Credits & Development
+
+All application code is (c) Jan Krutisch
+
+Thanks to the devKitPro/devKitArm/libnds team for making this possible.
+
+h2. License
+
+This is likely to change, but for now its the WTFPL.
+
+DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+                   Version 2, December 2004
+
+Copyright (C) 2004 Sam Hocevar
+ 14 rue de Plaisance, 75014 Paris, France
+Everyone is permitted to copy and distribute verbatim or modified
+copies of this license document, and changing it is allowed as long
+as the name is changed.
+
+DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+ TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+0. You just DO WHAT THE FUCK YOU WANT TO.
