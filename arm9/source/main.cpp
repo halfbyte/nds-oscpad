@@ -55,14 +55,48 @@ void arm9_fifo() { // check incoming fifo messages
    if(value == 0x87654321) Wifi_Sync();
 }
 
-
 char sendbuf[4096];
-void sendOSCMessage() {
+
+int copyOSCString(char *dest, char *src) {
+  
+  int len = 0;
+  int paddedLen = 0;
+  int words = 0;
+  int i;
+
+  strcpy(dest, src);
+  len = strlen(src) + 1;
+  
+  if ((len % 4) > 0) { 
+    words++;
+    words = (len / 4) + 1;
+    iprintf("needs padding for %d words\n", words);
+    paddedLen = words * 4;
+    for(i=len;i<paddedLen;i++)
+      dest[i] = 0;
+    len = paddedLen;
+  }
+  iprintf("string: %s, len: %d\n", src, len);
+
+  return len;
+}
+
+void sendOSCMessageI(char *url, long value) {
 	int sock, i;
 	int portnum = PORT;
+  int pos = 0;
+  long convValue = 0;
 	unsigned long destip = 16908298;
 	struct sockaddr_in sain;
-	strcpy(sendbuf,"/foo\0\0\0\0,i\0\0\0\0\0\1");
+  if(strlen(url) > 4095) return;
+  pos = 0;
+  pos += copyOSCString(&sendbuf[pos], "/foo");
+  pos += copyOSCString(&sendbuf[pos], ",i");
+    
+  convValue = ntohl(value);
+  memcpy(&sendbuf[pos], &convValue, 4);
+  pos += 4;
+  
 	
 	sock=socket(AF_INET,SOCK_DGRAM,0);
 	sain.sin_family=AF_INET;
@@ -75,7 +109,7 @@ void sendOSCMessage() {
 	sain.sin_family=AF_INET;
 	sain.sin_port=htons(portnum);
 	sain.sin_addr.s_addr=destip;
-	sendto(sock,sendbuf,16,0,(struct sockaddr *)&sain,sizeof(sain));
+	sendto(sock,sendbuf,pos,0,(struct sockaddr *)&sain,sizeof(sain));
 	
 	closesocket(sock);
 }
@@ -86,6 +120,8 @@ int main(void) {
 //---------------------------------------------------------------------------------
 
 	//touchPosition touchXY;
+
+  int OSCcounter = 0;
 
 	videoSetMode(0);	//not using the main screen
 	videoSetModeSub(MODE_0_2D | DISPLAY_BG0_ACTIVE);	//sub bg 0 will be used to print text
@@ -158,8 +194,9 @@ int main(void) {
 		while(VCOUNT<192);
 		scanKeys();
 		if(keysDown()&KEY_A) {
-			sendOSCMessage();
+			sendOSCMessageI("/foo", OSCcounter);
 			iprintf("sending packet\n");
+      OSCcounter++;
 		}
 	};
 
