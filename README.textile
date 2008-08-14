@@ -1,7 +1,5 @@
 h1. nds-OSCpad
 
-
-
 h2. What OSCpad will be:
 
  * An nds homebrew application that is basically a very flexible controller sending OSC (Open Sound Control) messages for almost every input available.
@@ -25,10 +23,11 @@ h2. sent messages
 * Touchpad samples: /nds/touch ,iii (x,y,pressure) // pressure's currently not working, I seem to use the wrong formula. Messages are sent as long as the pen is down.
 * Touchpad events: /nds/touch ,s (event) where event is UP or DOWN for KEYDOWN and KEYUP
 * NDSMotion samples /nds/motion ,iiii (x,y,z,gyro) // currently I'm sending the raw values, I'll switch over to the calibrated values soon.
+* Button Event: /nds/button,ss (button, event) where button is one of UP DOWN LEFT RIGHT R L X Y A B START and event is one of UP DOWN.
+* Special Button Event /nds/button,ss (button, event) where button is LID and event is one of OPEN CLOSE
 
 h2. planned messages (not yet implemented)
 
-* Button Event: /nds/button,ss (button, event) where button is one of UP DOWN LEFT RIGHT R L X Y A B START and event is one of UP DOWN. (I'll reserve the SELECT button to things like mode changes, IP configuration etc.) (TOP PRIORITY)
 * Microphone Volume sampling: /nds/mic, i (volume) where volume is simply the sampled volume on the NDS mic. (LOWER PRIORITY)
 
 h2. Visualisation
