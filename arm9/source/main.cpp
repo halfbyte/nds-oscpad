@@ -145,6 +145,15 @@ void sendOSCMessageS(char *url, char *value) {
   pos += copyOSCString(&sendbuf[pos], value);    
 	sendto(sock,sendbuf,pos,0,(struct sockaddr *)&sain,sizeof(sain));	
 }
+void sendOSCMessageSS(char *url, char *value1, char *value2) {
+  int pos = 0;
+  if(strlen(url) > 4095) return;
+  pos += copyOSCString(&sendbuf[pos], url);
+  pos += copyOSCString(&sendbuf[pos], ",ss");
+  pos += copyOSCString(&sendbuf[pos], value1);
+  pos += copyOSCString(&sendbuf[pos], value2);
+	sendto(sock,sendbuf,pos,0,(struct sockaddr *)&sain,sizeof(sain));	
+}
 
 
 //---------------------------------------------------------------------------------
@@ -250,9 +259,12 @@ int main(void) {
 		while(VCOUNT>192);
 		while(VCOUNT<192);
 		scanKeys();
+		
+		////////////////// TOUCHSCREEN
 		if((keysHeld()&KEY_TOUCH)) {
 		  touchPosition touchXY;
 		  touchXY=touchReadXY();
+      iprintf("\x1b[10;0Htouch 1, touch 2 : %d, %d\n", touchXY.z1, touchXY.z2);
 		  int intPressure = (touchXY.x * touchXY.z2) / (64 * touchXY.z1) - touchXY.x / 64;
 			sendOSCMessageIII("/nds/touch", touchXY.px, touchXY.py, intPressure);
 		}
@@ -262,6 +274,93 @@ int main(void) {
 		if (keysDown()&KEY_TOUCH) {
 		  sendOSCMessageS("/nds/touch", "DOWN");
 		}
+
+    ////////////////////// BUTTONS
+		if(keysUp()&KEY_START) {
+			sendOSCMessageSS("/nds/button", "START", "UP");
+		}
+		if(keysDown()&KEY_START) {
+			sendOSCMessageSS("/nds/button", "START", "DOWN");
+		}
+
+		if(keysUp()&KEY_A) {
+			sendOSCMessageSS("/nds/button", "A", "UP");
+		}
+		if(keysDown()&KEY_A) {
+			sendOSCMessageSS("/nds/button", "A", "DOWN");
+		}
+
+		if(keysUp()&KEY_B) {
+			sendOSCMessageSS("/nds/button", "B", "UP");
+		}
+		if(keysDown()&KEY_B) {
+			sendOSCMessageSS("/nds/button", "B", "DOWN");
+		}
+
+		if(keysUp()&KEY_L) {
+			sendOSCMessageSS("/nds/button", "L", "UP");
+		}
+		if(keysDown()&KEY_L) {
+			sendOSCMessageSS("/nds/button", "L", "DOWN");
+		}
+
+		if(keysUp()&KEY_R) {
+			sendOSCMessageSS("/nds/button", "R", "UP");
+		}
+		if(keysDown()&KEY_R) {
+			sendOSCMessageSS("/nds/button", "R", "DOWN");
+		}
+
+		if(keysUp()&KEY_X) {
+			sendOSCMessageSS("/nds/button", "X", "UP");
+		}
+		if(keysDown()&KEY_X) {
+			sendOSCMessageSS("/nds/button", "X", "DOWN");
+		}
+
+		if(keysUp()&KEY_Y) {
+			sendOSCMessageSS("/nds/button", "Y", "UP");
+		}
+		if(keysDown()&KEY_Y) {
+			sendOSCMessageSS("/nds/button", "Y", "DOWN");
+		}
+
+		if(keysUp()&KEY_UP) {
+			sendOSCMessageSS("/nds/button", "UP", "UP");
+		}
+		if(keysDown()&KEY_UP) {
+			sendOSCMessageSS("/nds/button", "UP", "DOWN");
+		}
+
+		if(keysUp()&KEY_DOWN) {
+			sendOSCMessageSS("/nds/button", "DOWN", "UP");
+		}
+		if(keysDown()&KEY_DOWN) {
+			sendOSCMessageSS("/nds/button", "DOWN", "DOWN");
+		}
+
+		if(keysUp()&KEY_LEFT) {
+			sendOSCMessageSS("/nds/button", "LEFT", "UP");
+		}
+		if(keysDown()&KEY_LEFT) {
+			sendOSCMessageSS("/nds/button", "LEFT", "DOWN");
+		}
+
+		if(keysUp()&KEY_RIGHT) {
+			sendOSCMessageSS("/nds/button", "RIGHT", "UP");
+		}
+		if(keysDown()&KEY_RIGHT) {
+			sendOSCMessageSS("/nds/button", "RIGHT", "DOWN");
+		}
+    // just for the heck of it
+		if(keysUp()&KEY_LID) {
+			sendOSCMessageSS("/nds/button", "LID", "OPEN");
+		}
+		if(keysDown()&KEY_LID) {
+			sendOSCMessageSS("/nds/button", "LID", "CLOSE");
+		}
+
+		/////////////////////// NDSMOTION (if present)
 		if (ndsmotion) {
       int x=0;
       int y=0;
