@@ -1,22 +1,10 @@
 /*---------------------------------------------------------------------------------
-	$Id: template.c,v 1.4 2005/09/17 23:15:13 wntrmute Exp $
 
-	Basic Hello World
+OSCpad. Use your Nintendo DS as an OSC speaking multi controller.
 
-	$Log: template.c,v $
-	Revision 1.4  2005/09/17 23:15:13  wntrmute
-	corrected iprintAt in templates
-	
-	Revision 1.3  2005/09/05 00:32:20  wntrmute
-	removed references to IPC struct
-	replaced with API functions
-	
-	Revision 1.2  2005/08/31 01:24:21  wntrmute
-	updated for new stdio support
+(c) half/byte aka Jan Krutisch
 
-	Revision 1.1  2005/08/03 06:29:56  wntrmute
-	added templates
-
+http://theqtisch.com/
 
 ---------------------------------------------------------------------------------*/
 #include "nds.h"
@@ -32,12 +20,12 @@
 #include <nds/arm9/ndsmotion.h>
 #include <fat.h>
 
+// fallback values, compatible with Mac Wifi Sharing.
 
 #define ADDRESS "10.0.2.1"
 #define PORT 7000
 
 #define OUTPUT_BUFFER_SIZE 1024
-
 
 #define		VCOUNT		(*((u16 volatile *) 0x04000006))
 
@@ -218,8 +206,10 @@ int main(void) {
       if (!returnCode) break;
       hostName = strtok(configData, ":");
       if (!hostName) continue;
+      iprintf("new hostname: <%s>\b", hostName);
       portName = strtok(NULL, ":");
       if (!portName) continue;
+      iprintf("portName: %s\n", portName);
       strcpy(hostname, hostName);
       portnum = atoi(portName);
       break;
