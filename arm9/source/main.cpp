@@ -30,6 +30,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #include <nds/arm9/ndsmotion.h>
+#include <fat.h>
 
 
 #define ADDRESS "10.0.2.1"
@@ -59,7 +60,6 @@ void arm9_fifo() { // check incoming fifo messages
 char sendbuf[4096];
 struct sockaddr_in sain;
 int sock;
-int portnum = PORT;
 
 
 int copyOSCString(char *dest, char *src) {
@@ -162,7 +162,13 @@ int main(void) {
 
 	//touchPosition touchXY;
   int i;
-	unsigned long destip = 16908298;
+  char configData[1024];
+  char *returnCode;
+  
+  char hostname[1024];
+  int portnum;
+  
+  hostent *hostByName;
 	
   int ndsmotion;
 
@@ -189,6 +195,45 @@ int main(void) {
   } else {
     iprintf("NDSMotion not present\n");    
   }
+  
+  fatInitDefault();
+  
+  // trying to read config file now
+  
+  // 
+  strcpy(hostname, ADDRESS);
+  portnum = PORT;
+  
+  iprintf("trying to open /oscpad/config.txt\n");
+  
+  FILE* configFile = fopen ("/oscpad/config.txt", "rb");
+  
+  // ugly fugly config file parsing 
+  if (configFile) {
+    char *portName;
+    char *hostName;
+    int success = 0;
+    while(!success) {
+      returnCode = fgets(configData, 255, configFile);
+      if (!returnCode) break;
+      hostName = strtok(configData, ":");
+      if (!hostName) continue;
+      portName = strtok(NULL, ":");
+      if (!portName) continue;
+      strcpy(hostname, hostName);
+      portnum = atoi(portName);
+      break;
+    }
+  } else {
+    iprintf("no config file found. make one :)\n");
+  }
+  iprintf("netconf: %s:%d\n", hostname, portnum);
+  
+  fclose(configFile);
+  iprintf("closed config file\n");
+  
+  
+  
 
 	{ // send fifo message to initialize the arm7 wifi
 		REG_IPC_FIFO_CR = IPC_FIFO_ENABLE | IPC_FIFO_SEND_CLEAR; // enable & clear FIFO
@@ -243,6 +288,16 @@ int main(void) {
 
     //closesocket(my_socket); // remove the socket.
 
+
+  hostByName = gethostbyname(hostname);
+  
+  if (!hostByName)
+  {
+      iprintf("gethostbyname() failed. aborting.\n");
+      return 0;
+  }
+  
+
 	sock=socket(AF_INET,SOCK_DGRAM,0);
 	sain.sin_family=AF_INET;
 	sain.sin_port=htons(portnum);
@@ -252,7 +307,7 @@ int main(void) {
 	
 	sain.sin_family=AF_INET;
 	sain.sin_port=htons(portnum);
-	sain.sin_addr.s_addr=destip;
+	sain.sin_addr = *(struct in_addr*) hostByName->h_addr_list[0];
 
 
     while(1) {
